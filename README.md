@@ -1,4 +1,4 @@
-# storage-nonsense
+# Storage Nonsense
 
 This simple Windows service completely wipes all user `%TEMP%` directories upon PC shutdown.
 
