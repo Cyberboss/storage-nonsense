@@ -28,6 +28,5 @@ The binaries in the Releases are generated and attested by GitHub actions. Feel 
 Alternatively, clone the repo and build it yourself. You'll need the [.NET 10+ SDK](https://dotnet.microsoft.com/en-us/download).
 
 ```
-cd src/StorageNonsense
 dotnet publish /nowarn:NETSDK1194 -o C:\path\to\bin
 ```
