@@ -1,0 +1,15 @@
+*
+!*/
+
+!.editorconfig
+!.gitattributes
+!.gitignore
+!LICENSE
+!README.md
+!storage-nonsense.slnx
+
+!.github/**
+!/src/**
+
+[Bb]in/
+[Oo]bj/

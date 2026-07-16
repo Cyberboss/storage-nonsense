@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/.github/">
+    <File Path=".github/CODE_OF_CONDUCT.md" />
+    <File Path=".github/CODEOWNERS" />
+    <File Path=".github/dependabot.yml" />
+    <File Path=".github/FUNDING.yml" />
+  </Folder>
+  <Folder Name="/.github/workflows/">
+    <File Path=".github/workflows/ci.yml" />
+  </Folder>
+  <Folder Name="/Root/">
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="src/StorageNonsense/StorageNonsense.csproj" Id="73b39cba-2c98-4297-98f7-2e1b22b948f3" />
+</Solution>
