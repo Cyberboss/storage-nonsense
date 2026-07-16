@@ -14,5 +14,5 @@
     <File Path=".gitignore" />
     <File Path="README.md" />
   </Folder>
-  <Project Path="src/StorageNonsense/StorageNonsense.csproj" Id="73b39cba-2c98-4297-98f7-2e1b22b948f3" />
+  <Project Path="src/StorageNonsense/StorageNonsense.csproj" />
 </Solution>

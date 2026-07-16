@@ -17,19 +17,27 @@ namespace StorageNonsense
 	{
 		private readonly IFileSystem fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 		private readonly ILogger<CleanupService> logger = logger ?? throw new ArgumentNullException(nameof(logger));
-		private readonly List<IDirectoryInfo> tempDirectories = new List<IDirectoryInfo>();
 
 		/// <inheritdoc />
 		public Task StartAsync(CancellationToken cancellationToken)
+			=> Task.CompletedTask;
+
+		/// <inheritdoc />
+		public Task StopAsync(CancellationToken cancellationToken)
 		{
 			logger.LogInformation("Listing all user temporary directory paths:");
 
 			const string ProfileListKey = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList";
 			using var key = Registry.LocalMachine.OpenSubKey(ProfileListKey);
 			if (key == null)
-				throw new InvalidOperationException("Could not open ProfileList registry key.");
+			{
+				logger.LogError("Could not open ProfileList registry key.");
+				return Task.CompletedTask;
+			}
 
-			foreach (var sidName in key.GetSubKeyNames())
+			var subKeyNames = key.GetSubKeyNames();
+			List<IDirectoryInfo> tempDirectories = new List<IDirectoryInfo>(subKeyNames.Length);
+			foreach (var sidName in subKeyNames)
 			{
 				using var profileKey = key.OpenSubKey(sidName);
 				if (profileKey == null)
@@ -44,18 +52,14 @@ namespace StorageNonsense
 
 				var tempPath = fileSystem.Path.Combine(profilePath, "AppData", "Local", "Temp");
 
-				logger.LogInformation("\t- {tempPath}", tempPath);
+				logger.LogInformation("{sidName}: {tempPath}", sidName, tempPath);
 
 				var directoryInfo = fileSystem.DirectoryInfo.New(tempPath);
 				tempDirectories.Add(directoryInfo);
 			}
 
-			return Task.CompletedTask;
+			return Task.WhenAll(tempDirectories.Select(RecursiveDirectoryDelete));
 		}
-
-		/// <inheritdoc />
-		public Task StopAsync(CancellationToken cancellationToken)
-			=> Task.WhenAll(tempDirectories.Select(RecursiveDirectoryDelete));
 
 		// Import the MoveFileEx function from kernel32.dll
 		[DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
@@ -73,7 +77,7 @@ namespace StorageNonsense
 			if (!directoryInfo.Exists)
 				return true;
 
-			bool allDeleted = true;
+			var allDeleted = true;
 			foreach (var file in directoryInfo.EnumerateFiles())
 				try
 				{

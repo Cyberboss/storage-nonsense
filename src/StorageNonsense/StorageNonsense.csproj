@@ -1,5 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
 
+  <PropertyGroup Condition="'$(STORAGE_NONSENSE_VERSION)' != ''">
+    <Version>$(STORAGE_NONSENSE_VERSION)</Version>
+  </PropertyGroup>
+
   <PropertyGroup>
     <TargetFramework>net10.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
