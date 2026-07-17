@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -23,7 +24,7 @@ namespace StorageNonsense
 			=> Task.CompletedTask;
 
 		/// <inheritdoc />
-		public Task StopAsync(CancellationToken cancellationToken)
+		public async Task StopAsync(CancellationToken cancellationToken)
 		{
 			logger.LogInformation("Listing all user temporary directory paths:");
 
@@ -32,7 +33,7 @@ namespace StorageNonsense
 			if (key == null)
 			{
 				logger.LogError("Could not open ProfileList registry key.");
-				return Task.CompletedTask;
+				return;
 			}
 
 			var subKeyNames = key.GetSubKeyNames();
@@ -58,7 +59,11 @@ namespace StorageNonsense
 				tempDirectories.Add(directoryInfo);
 			}
 
-			return Task.WhenAll(tempDirectories.Select(RecursiveDirectoryDelete));
+			logger.LogInformation("Starting deletion...");
+			var stopwatch = Stopwatch.StartNew();
+			await Task.WhenAll(tempDirectories.Select(RecursiveDirectoryDelete));
+			stopwatch.Stop();
+			logger.LogInformation("Deletion took {seconds}s", stopwatch.Elapsed.TotalSeconds);
 		}
 
 		// Import the MoveFileEx function from kernel32.dll
@@ -72,10 +77,10 @@ namespace StorageNonsense
 		{
 			await Task.Yield();
 
-			List<Task<bool>> dependentTasks = directoryInfo.EnumerateDirectories().Select(RecursiveDirectoryDelete).ToList();
-
 			if (!directoryInfo.Exists)
 				return true;
+
+			List<Task<bool>> dependentTasks = directoryInfo.EnumerateDirectories().Select(RecursiveDirectoryDelete).ToList();
 
 			var allDeleted = true;
 			foreach (var file in directoryInfo.EnumerateFiles())
@@ -92,7 +97,14 @@ namespace StorageNonsense
 						logger.LogError(new Win32Exception(Marshal.GetLastPInvokeError()), "Failed to delete file on shutdown: {fullName}", file.FullName);
 				}
 
-			await Task.WhenAll(dependentTasks);
+			try
+			{
+				await Task.WhenAll(dependentTasks);
+			}
+			catch (Exception ex)
+			{
+				logger.LogError(ex, "Error in recursive task!");
+			}
 
 			if (allDeleted && dependentTasks.All(task => task.Result))
 			{

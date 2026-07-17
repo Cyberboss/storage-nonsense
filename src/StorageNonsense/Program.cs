@@ -1,4 +1,5 @@
-﻿using System.IO.Abstractions;
+﻿using System;
+using System.IO.Abstractions;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +21,8 @@ namespace StorageNonsense
 				.AddWindowsService(options => options.ServiceName = "storage-nonsense")
 				.AddSingleton<IFileSystem, FileSystem>()
 				.AddHostedService<CleanupService>()
-				.Configure<LoggerFilterOptions>(options => options.Rules.Clear());
+				.Configure<LoggerFilterOptions>(options => options.Rules.Clear())
+				.Configure<HostOptions>(options => options.ShutdownTimeout = TimeSpan.FromHours(1));
 
 			LoggerProviderOptions.RegisterProviderOptions<EventLogSettings, EventLogLoggerProvider>(serviceCollection);
 

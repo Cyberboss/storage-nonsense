@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  STORAGE_NONSENSE_VERSION: 1.0.0
+  STORAGE_NONSENSE_VERSION: 1.1.0
 
 jobs:
   build:
