@@ -1,3 +1,7 @@
+# v1.1.1
+
+- Enable release immutability (@Cyberboss)
+
 # v1.1.0
 
 - Added profiling and better error handling (@Cyberboss)

@@ -23,7 +23,7 @@ Verbose logs can be found in the Windows Event Viewer under `Windows/Application
 
 ## I'm paranoid, what if this is a virus?
 
-The binaries in the Releases are generated and attested by GitHub actions. Feel free to inspect the source code yourself.
+The binaries in the immutable Releases are generated and attested by GitHub actions. Feel free to inspect the source code and output hashes yourself.
 
 Alternatively, clone the repo and build it yourself. You'll need the [.NET 10+ SDK](https://dotnet.microsoft.com/en-us/download).
 
